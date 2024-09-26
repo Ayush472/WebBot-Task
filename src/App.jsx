@@ -26,7 +26,12 @@ function App() {
       { id: camera.id, status: camera.status === "Active" ? "Inactive" : "Active" },
       {
         onSuccess: () => {
-          notification.success({ description: "Status updated successfully" });
+          notification.success({
+            message: "Update Status",
+            description: "Update Successfully",
+            duration: 2,
+            placement: "topRight",
+          });
           refetch();
         },
         onError: (error) => console.error("Error updating status:", error),
@@ -49,15 +54,15 @@ function App() {
       <div style={{ textAlign: "center" }}>
         <img src={WebBotImg} alt="WebBotImg" />
       </div>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
 
-      <h1>Camera Management</h1>
-      <Input
-        placeholder="Search..."
-        value={generalSearch}
-        onChange={(e) => setGeneralSearch(e.target.value)}
-        style={{ width: 200,height:30 }}
-      />
+        <h1>Camera Management</h1>
+        <Input
+          placeholder="Search..."
+          value={generalSearch}
+          onChange={(e) => setGeneralSearch(e.target.value)}
+          style={{ width: 200, height: 30 }}
+        />
       </div>
       <FilterBar filterParams={filterParams} setFilterParams={setFilterParams} data={data} />
       <CameraTable
