@@ -17,7 +17,7 @@ const CameraTable = ({ data, loading, pagination, setPagination, handleUpdateSta
         <div style={{ display: "flex", alignItems: "center" }}>
           <span>{name}</span>
         </div>
-      ),
+      ), sorter: (a, b) => a.name.localeCompare(b.name) 
     },
     {
       title: "HEALTH",
