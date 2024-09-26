@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import api from "./api/api";
-import { Button, notification, Popconfirm, Progress, Table,Input } from "antd";
+import { Button, notification, Popconfirm, Progress, Table, Input } from "antd";
 import { RiCloudLine, RiServerFill } from "react-icons/ri";
 import { PiWarningCircleBold } from "react-icons/pi";
 import { CgUnavailable } from "react-icons/cg";
@@ -172,7 +172,7 @@ function App() {
     setFilter(e.target.value);
   };
 
-  const filteredData = data?.filter((item) =>
+  const filteredData = data?.data?.data?.filter((item) =>
     item.tasks.toLowerCase().includes(filter.toLowerCase())
   );
   return (
