@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import api from "./api/api";
-import { Button, notification, Popconfirm, Progress, Table, Input } from "antd";
-import { RiCloudLine, RiServerFill } from "react-icons/ri";
+import { Button, notification, Popconfirm, Progress, Table, Input, Select } from "antd";
+import { RiCloudLine, RiServerFill, RiSearchLine, RiMapPinLine, RiDeleteBinLine } from "react-icons/ri";
 import { PiWarningCircleBold } from "react-icons/pi";
 import { CgUnavailable } from "react-icons/cg";
 import { CiCircleCheck } from "react-icons/ci";
+import { FaWifi } from "react-icons/fa";
+import WebBotImg from "../src/assets/images/wobot_logo_blue.svg"
+const { Option } = Select;
 
 function App() {
-  const { data, isLoading, isSuccess } = useQuery("todos", api.fetchCameras);
+  const { data, isLoading, isSuccess, refetch } = useQuery("todos", api.fetchCameras);
   const updateCameraStatus = useMutation(api.updateCameraStatus);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [pagination, setPagination] = useState({
@@ -16,6 +19,10 @@ function App() {
     pageSize: 10,
   });
   const [filter, setFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState(null);
+  const [statusFilter, setStatusFilter] = useState(null);
+  const [generalSearch, setGeneralSearch] = useState("");
+  const [localData, setLocalData] = useState(data?.data?.data || []);
 
   // Handle table change (pagination, filtering, sorting)
   const handleTableChange = (newPagination, filters, sorter) => {
@@ -29,6 +36,11 @@ function App() {
   const handleSelectChange = (selectedRowKeys) => {
     setSelectedRowKeys(selectedRowKeys);
   };
+  useEffect(() => {
+    if (data?.data?.data) {
+      setLocalData(data.data.data);
+    }
+  }, [data]);
   const rowSelection = {
     selectedRowKeys,
     onChange: handleSelectChange,
@@ -58,11 +70,6 @@ function App() {
           )}
         </div>
       ),
-      filters: [
-        { text: "Online", value: "Online" },
-        { text: "Offline", value: "Offline" },
-      ],
-      onFilter: (value, record) => record.current_status === value,
     },
     {
       title: "HEALTH",
@@ -87,11 +94,6 @@ function App() {
           />
         </div>
       ),
-      filters: [
-        { text: "Healthy", value: "A" },
-        { text: "Warning", value: "B" },
-      ],
-      onFilter: (value, record) => record.health.cloud === value,
     },
     {
       title: "LOCATION",
@@ -127,26 +129,33 @@ function App() {
       title: "ACTION",
       dataIndex: "status",
       render: (status, objectData) => (
-        <Popconfirm
-          title="Update Status"
-          description="Are you sure you update the server stauts?"
-          onConfirm={() => handleUpdateStauts(objectData)}
-          onCancel={() => console.log("Not Update the Value ")}
-          okText="submit"
-          cancelText="Cancel"
-        >
-          <div
-            onClick={(e) => {
-              console.log(e, status);
-            }}
+        <div style={{ display: "flex" }}>
+
+          <Popconfirm
+            title="Update Status"
+            description="Are you sure you update the server stauts?"
+            onConfirm={() => handleUpdateStauts(objectData)}
+            onCancel={() => console.log("Not Update the Value ")}
+            okText="submit"
+            cancelText="Cancel"
           >
-            {status === "Active" ? (
-              <CgUnavailable style={{ fontSize: "18px" }} />
-            ) : (
-              <CiCircleCheck style={{ color: "green", fontSize: "18px" }} />
-            )}
-          </div>
-        </Popconfirm>
+            <div
+              onClick={(e) => {
+                console.log(e, status);
+              }}
+            >
+              {status === "Active" ? (
+                <CgUnavailable style={{ fontSize: "18px" }} />
+              ) : (
+                <CiCircleCheck style={{ color: "green", fontSize: "18px" }} />
+              )}
+            </div>
+          </Popconfirm>
+          <RiDeleteBinLine
+            style={{ color: "red", fontSize: "18px", marginLeft: 16, cursor: "pointer" }}
+            onClick={() => handleDelete(objectData.id)}
+          />
+        </div>
       ),
     },
   ];
@@ -160,7 +169,10 @@ function App() {
       {
         onSuccess: (data) => {
           console.log("Update Successfully", data);
-          notification.success();
+          notification.success({
+            description: "Update Successfully",
+          });
+          refetch(); // Refetch the data after successful update
         },
         onError: (error) => {
           console.log("Error", error);
@@ -172,21 +184,83 @@ function App() {
     setFilter(e.target.value);
   };
 
-  const filteredData = data?.data?.data?.filter((item) =>
-    item.tasks.toLowerCase().includes(filter.toLowerCase())
-  );
+  const handleLocationFilterChange = (value) => {
+    setLocationFilter(value);
+  };
+
+  const handleStatusFilterChange = (value) => {
+    setStatusFilter(value);
+  };
+
+  const handleGeneralSearchChange = (e) => {
+    setGeneralSearch(e.target.value);
+  };
+
+  const filteredData = localData
+    ?.filter((item) =>
+      item.tasks.toLowerCase().includes(filter.toLowerCase())
+    )
+    ?.filter((item) =>
+      locationFilter ? item.location === locationFilter : true
+    )
+    ?.filter((item) =>
+      statusFilter ? item.status === statusFilter : true
+    )
+    ?.filter((item) =>
+      generalSearch ?
+        Object.values(item).some(val =>
+          String(val).toLowerCase().includes(generalSearch.toLowerCase())
+        )
+        : true
+    ); const handleDelete = (id) => {
+      setLocalData(localData.filter(item => item.id !== id));
+    };
+
   return (
     <>
-      <h1>Camera Management</h1>
-      <Input
-        placeholder="Filter tasks"
-        value={filter}
-        onChange={handleFilterChange}
-        style={{ marginBottom: 16 }}
-      />
+    <div style={{textAlign:"center"}}>
+      <img src={WebBotImg} alt="WebBotImg" />
+    </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1>Camera Management</h1>
+        <Input
+          placeholder="Search..."
+          value={generalSearch}
+          onChange={handleGeneralSearchChange}
+          style={{ width: 200 }}
+          prefix={<RiSearchLine />}
+        />
+      </div>
+      <div style={{ display: "flex", marginBottom: 16 }}>
+        <Input
+          placeholder="Filter tasks"
+          value={filter}
+          onChange={handleFilterChange}
+          style={{ marginRight: 16, width: 200 }}
+        />
+        <Select
+          placeholder={<span style={{ display: "flex", alignItems: "center" }}><RiMapPinLine style={{ marginRight: 10 }} /> Location</span>}
+          value={locationFilter}
+          onChange={handleLocationFilterChange}
+          style={{ marginRight: 16, width: 200 }}
+        >
+          {Array.from(new Set(data?.data?.data?.map(item => item.location))).map(location => (
+            <Option key={location} value={location}>{location}</Option>
+          ))}
+        </Select>
+        <Select
+          placeholder={<span style={{ display: "flex", alignItems: "center" }}><FaWifi style={{ marginRight: 10, transform: 'rotateZ(45deg)' }} /> Status</span>}
+          value={statusFilter}
+          onChange={handleStatusFilterChange}
+          style={{ width: 200 }}
+        >
+          <Option value="Active">Active</Option>
+          <Option value="Inactive">Inactive</Option>
+        </Select>
+      </div>
       <Table
         loading={isLoading}
-        dataSource={data?.data?.data} // Assuming data is structured this way
+        dataSource={filteredData} // Use filtered data
         columns={columns}
         rowSelection={rowSelection}
         rowKey="id"

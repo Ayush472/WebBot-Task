@@ -22,7 +22,7 @@ class FetchData {
     return fetchApi.get(apiRoutes.listCameras);
   }
   async updateCameraStatus(data) {
-    return fetchApi.post(apiRoutes.updateCameraStatus, data);
+    return fetchApi.put(apiRoutes.updateCameraStatus, data);
   }
 }
 export default new FetchData();
