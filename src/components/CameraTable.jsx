@@ -40,10 +40,10 @@ const CameraTable = ({ data, loading, pagination, setPagination, handleUpdateSta
       dataIndex: "status",
       render: (status, record) => (
         <div style={{ display: "flex" }}>
-          <Popconfirm title="Update Status" onConfirm={() => handleUpdateStatus(record)}>
-            {status === "Active" ? <CgUnavailable /> : <CiCircleCheck style={{ color: "green" }} />}
+          <Popconfirm title={`change status to ${status === "Active" ? "Inactive" : "Active"}?`} onConfirm={() => handleUpdateStatus(record)}>
+            {status === "Active" ? <CgUnavailable style={{ cursor: "pointer" }} /> : <CiCircleCheck style={{ color: "green", cursor: "pointer" }} />}
           </Popconfirm>
-          <RiDeleteBinLine style={{ color: "red", marginLeft: 16 }} onClick={() => handleDelete(record.id)} />
+          <RiDeleteBinLine style={{ color: "red", marginLeft: 16, cursor: "pointer" }} onClick={() => handleDelete(record.id)} />
         </div>
       ),
     },
