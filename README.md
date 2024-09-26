@@ -6,3 +6,27 @@ Currently, two official plugins are available:
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+### Installation
+
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/Ayush472/WebBot-Task.git
+    cd your-repo-name
+    ```
+
+2. Install the dependencies:
+    ```sh
+    npm install
+    # or
+    yarn install
+    ```
+
+### Running the Application
+
+To start the development server with hot module replacement:
+
+```sh
+npm run dev
+# or
+yarn dev
