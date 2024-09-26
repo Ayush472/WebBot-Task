@@ -12,7 +12,7 @@ Currently, two official plugins are available:
 1. Clone the repository:
     ```sh
     git clone https://github.com/Ayush472/WebBot-Task.git
-    cd your-repo-name
+    cd WebBot-Task
     ```
 
 2. Install the dependencies:
